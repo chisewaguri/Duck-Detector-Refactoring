@@ -76,8 +76,9 @@ internal fun NativeRootMethodEvidence.kernelInterfaceMethods(): List<NativeRootM
             else -> NativeRootMethodOutcome.SUPPORT
         },
         detail = buildString {
-            append("Times __NR_supercall (syscall 45, the arm64 truncate slot KernelPatch takes over) with a 128-byte key and with an empty key. ")
-            append("KernelPatch older than commit 84169d5d6be12e589ccac81d71dcebb80b22043a copied the key with strncpy_from_user before authorizing it, so the longer key cost measurably more.\n")
+            append("Times __NR_supercall (syscall 45, the arm64 truncate slot KernelPatch takes over) with a 128-byte key and with an empty key, ")
+            append("and compares the full/empty ratio. KernelPatch older than commit 84169d5d6be12e589ccac81d71dcebb80b22043a copied the key with strncpy_from_user before authorizing it, so the longer key cost several times more.\n")
+            append("The ratio is used instead of the absolute difference because the clean strncpy-plus-path-walk cost is hardware-dependent: on modern GKI the same clean difference that measured 0.35 us on the calibration device exceeds 3 us, which put every clean kernel above the old threshold.\n")
             append("That commit stopped copying before auth, which puts a fixed build back on the same footing as an unmodified kernel. ")
             append("So a result here that is not \"Detected\" rules out the older leak only, not KernelPatch itself; the superkey probe is what covers current builds.\n")
             append("Test Result: ${snapshot.kernelPatchSideChannelDetail}")
